@@ -3,28 +3,24 @@ $ = require 'jquery'
 module.exports =
 
   activate: (state) ->
-    atom.workspaceView.command "resize-panes:enlarge-active-pane", => @enlarge()
-    atom.workspaceView.command "resize-panes:shrink-active-pane", => @shrink()
+    atom.commands.add 'atom-workspace', "resize-panes:enlarge-active-pane", => @enlarge()
+    atom.commands.add 'atom-workspace', "resize-panes:shrink-active-pane", => @shrink()
 
   enlarge: ->
-    flex = @getFlex()
-    flex.grow *= 1.1
-    flex.shrink *= 1.1
-    @setFlex flex
+    flexGrow = @getFlex()
+    flexGrow *= 1.1
+    @setFlex flexGrow
 
   shrink: ->
-    flex = @getFlex()
-    flex.shrink /= 1.1
-    flex.grow /= 1.1
-    @setFlex flex
+    flexGrow = @getFlex()
+    flexGrow /= 1.1
+    @setFlex flexGrow
 
   getFlex: ->
-    [grow,shrink,basis] = $('.pane.active').css('-webkit-flex').split ' '
-    return {grow,shrink,basis}
+    parseInt $('.pane.active').css('flexGrow')
 
-  setFlex: ({grow,shrink,basis}) ->
-    flex = [grow,shrink,basis].join ' '
-    $('.pane.active').css('-webkit-flex', flex)
+  setFlex: (grow) ->
+    $('.pane.active').css('-webkit-flex', grow)
 
   deactivate: ->
 
