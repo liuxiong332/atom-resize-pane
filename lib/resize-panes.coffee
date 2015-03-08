@@ -17,10 +17,10 @@ module.exports =
     @setFlex flexGrow
 
   getFlex: ->
-    parseInt $('.pane.active').css('flexGrow')
+    parseFloat $('.pane.active').css('flexGrow')
 
   setFlex: (grow) ->
-    $('.pane.active').css('-webkit-flex', grow)
+    $('.pane.active').css('flexGrow', grow.toString())
 
   deactivate: ->
 
