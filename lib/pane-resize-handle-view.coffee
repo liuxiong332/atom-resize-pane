@@ -23,8 +23,9 @@ class PaneResizeHandleView extends View
       @resizeStarted(e)
 
   resizeToFitContent: ->
-    @prevPane.css('flexGrow', 1)
-    @prevPane.css('flexGrow', 1)
+    # clear flex-grow css style of both pane
+    @prevPane.css('flexGrow', '')
+    @next.css('flexGrow', '')
 
   resizeStarted: ->
     e.stopPropagation()
@@ -33,28 +34,31 @@ class PaneResizeHandleView extends View
 
   calcRatio: (ratio1, ratio2, total) ->
     allRatio = ratio1 + ratio2
-    [total * ratio1 / allRatio, total * ratio2 / allRatio ]
+    [total * ratio1 / allRatio, total * ratio2 / allRatio]
 
-  resizePane: ({pageX, pageY, which}) ->
+  getFlexGrow: (element) ->
+    parseFloat element.css('flexGrow')
+
+  setFlexGrow: (prevSize, nextSize) ->
+    flexGrow = @getFlexGrow(@prevPane) + @getFlexGrow(@nextPane)
+    flexGrows = @calcRatio(prevSize, nextSize, flexGrow)
+    @prevPane.css('flexGrow', flexGrows[0].toString())
+    @nextPane.css('flexGrow', flexGrows[1].toString())
+
+  resizePane: ({pageX, pageY, which}) =>
     return @resizeStopped() unless which is 1
-
-    flexGrow = @prevPane.css('flexGrow') + @nextPane.css('flexGrow')
 
     if @isHorizontal
       totalWidth = @prevPane.outerWidth() + @nextPane.outerWidth()
       leftWidth = pageX - @prevPane.offset().left
       rightWidth = totalWidth - leftWidth
-      flexGrows = @calcRatio(leftWidth, rightWidth, flexGrow)
-      @prevPane.css('flexGrow', flexGrows[0])
-      @nextPane.css('flexGrow', flexGrows[1])
+      @setFlexGrow(leftWidth, rightWidth)
     else
       totalHeight = @prevPane.outerHeight() + @nextPane.outerHeight()
       topHeight = pageY - @prevPane.offset().top
       bottomHeight = totalHeight - topHeight
-      flexGrows = @calcRatio(topHeight, bottomHeight, flexGrow)
-      @prevPane.css('flexGrow', flexGrows[0])
-      @nextPane.css('flexGrow', flexGrows[1])
+      @setFlexGrow(topHeight, bottomHeight)
 
-  resizeStopped: ->
+  resizeStopped: =>
     $(document).off('mousemove', @resizePane)
     $(document).off('mouseup', @resizeStopped)
